@@ -27,7 +27,7 @@ public class Employees {
                 return record.getWorkRecords();
             }
         }
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
