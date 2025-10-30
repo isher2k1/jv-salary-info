@@ -45,7 +45,8 @@ public class SalaryInfo {
         return employees;
     }
 
-    private int calculateGeneralOutcome(ArrayList<WorkRecord> workRecords, String dateFrom, String dateTo) {
+    private int calculateGeneralOutcome(ArrayList<WorkRecord> workRecords,
+                                        String dateFrom, String dateTo) {
         int generalOutcome = 0;
         for (WorkRecord record : workRecords) {
             if (record.isWorkedAtPeriod(LocalDate.parse(dateFrom, formatter),
