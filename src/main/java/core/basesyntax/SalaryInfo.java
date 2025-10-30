@@ -2,7 +2,6 @@ package core.basesyntax;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 
 public class SalaryInfo {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
@@ -14,12 +13,13 @@ public class SalaryInfo {
     private static final int INCOME_INDEX = 3;
 
     public String getSalaryInfo(String[] names, String[] data, String dateFrom, String dateTo) {
-        Employees employees = initEmployees(data);
+        LocalDate parsedDateFrom = LocalDate.parse(dateFrom, formatter);
+        LocalDate parsedDateTo = LocalDate.parse(dateTo, formatter);
+        Employees employees = initEmployees(data,parsedDateFrom, parsedDateTo);
         StringBuilder stringBuilder = new StringBuilder("Report for period "
                 + dateFrom + OUTPUT_DELIMITER + dateTo + System.lineSeparator());
         for (String name : names) {
-            ArrayList<WorkRecord> workRecords = employees.get(name);
-            int generalOutcome = calculateGeneralOutcome(workRecords, dateFrom, dateTo);
+            int generalOutcome = employees.getGeneralOutcome(name);
             stringBuilder.append(name)
                     .append(OUTPUT_DELIMITER)
                     .append(generalOutcome)
@@ -28,7 +28,7 @@ public class SalaryInfo {
         return stringBuilder.toString().trim();
     }
 
-    private Employees initEmployees(String[] data) {
+    private Employees initEmployees(String[] data, LocalDate dateFrom, LocalDate dateTo) {
         Employees employees = new Employees();
 
         for (String s : data) {
@@ -39,21 +39,8 @@ public class SalaryInfo {
             LocalDate date = LocalDate.parse(splitted[DATE_INDEX], formatter);
 
             WorkRecord workRecord = new WorkRecord(hours, incomePerHour, date);
-            employees.put(name, workRecord);
-
+            employees.put(name, workRecord, dateFrom, dateTo);
         }
         return employees;
-    }
-
-    private int calculateGeneralOutcome(ArrayList<WorkRecord> workRecords,
-                                        String dateFrom, String dateTo) {
-        int generalOutcome = 0;
-        for (WorkRecord record : workRecords) {
-            if (record.isWorkedAtPeriod(LocalDate.parse(dateFrom, formatter),
-                    LocalDate.parse(dateTo, formatter))) {
-                generalOutcome += record.getGeneralIncome();
-            }
-        }
-        return generalOutcome;
     }
 }

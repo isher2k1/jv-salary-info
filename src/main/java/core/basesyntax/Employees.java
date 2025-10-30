@@ -1,5 +1,6 @@
 package core.basesyntax;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Employees {
@@ -9,7 +10,10 @@ public class Employees {
         employeeRecords = new ArrayList<>();
     }
 
-    public void put(String name, WorkRecord workRecord) {
+    public void put(String name, WorkRecord workRecord, LocalDate dateFrom, LocalDate dateTo) {
+        if (!workRecord.isWorkedAtPeriod(dateFrom, dateTo)) {
+            return;
+        }
         for (EmployeeRecord record : employeeRecords) {
             if (record.getName().equals(name)) {
                 record.addWorkRecord(workRecord);
@@ -30,6 +34,15 @@ public class Employees {
         return new ArrayList<>();
     }
 
+    public int getGeneralOutcome(String name) {
+        for (EmployeeRecord record : employeeRecords) {
+            if (record.getName().equals(name)) {
+                return record.generalOutcome;
+            }
+        }
+        return 0;
+    }
+
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
@@ -42,12 +55,8 @@ public class Employees {
 
     private class EmployeeRecord {
         private String name;
+        private int generalOutcome;
         private ArrayList<WorkRecord> workRecords;
-
-        public EmployeeRecord(String name, ArrayList<WorkRecord> workRecords) {
-            this.name = name;
-            this.workRecords = workRecords;
-        }
 
         public EmployeeRecord(String name) {
             this.name = name;
@@ -66,12 +75,9 @@ public class Employees {
             return workRecords;
         }
 
-        public void setWorkRecords(ArrayList<WorkRecord> workRecords) {
-            this.workRecords = workRecords;
-        }
-
         public void addWorkRecord(WorkRecord workRecord) {
             this.workRecords.add(workRecord);
+            this.generalOutcome += workRecord.getGeneralIncome();
         }
 
         @Override
